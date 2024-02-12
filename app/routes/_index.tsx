@@ -1,4 +1,6 @@
 import type { MetaFunction } from "@remix-run/node";
+import { Link } from "@remix-run/react";
+import favicon from "../../public/favicon.ico";
 
 export const meta: MetaFunction = () => {
   return [
@@ -9,33 +11,15 @@ export const meta: MetaFunction = () => {
 
 export default function Index() {
   return (
-    <div style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.8" }}>
-      <h1>Welcome to Remix</h1>
-      <ul>
-        <li>
-          <a
-            target="_blank"
-            href="https://remix.run/tutorials/blog"
-            rel="noreferrer"
-          >
-            15m Quickstart Blog Tutorial
-          </a>
-        </li>
-        <li>
-          <a
-            target="_blank"
-            href="https://remix.run/tutorials/jokes"
-            rel="noreferrer"
-          >
-            Deep Dive Jokes App Tutorial
-          </a>
-        </li>
-        <li>
-          <a target="_blank" href="https://remix.run/docs" rel="noreferrer">
-            Remix Docs
-          </a>
-        </li>
-      </ul>
+    <div className="h-screen w-screen flex justify-center items-center flex-col gap-4">
+      <img src={favicon} alt="favicon" />
+      <div className="gap-4 flex flex-col items-center h-auto">
+        <h1>Welcome To Gary&apos;s Notes App built with Remix</h1>
+        <p>Click the Link below to access the better way to take notes:</p>
+        <Link to="/notes" className="text-blue-800">
+          About
+        </Link>
+      </div>
     </div>
   );
 }
