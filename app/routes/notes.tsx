@@ -1,23 +1,32 @@
 import NewNote from "../components/NewNote";
+import NotesList from "~/components/NotesList";
 import { writeNotes, readNotes } from "../database/notes.server";
-import type { ActionFunctionArgs } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import type { ActionFunctionArgs, MetaFunction } from "@remix-run/node";
+import { json } from "@remix-run/node";
+import {
+  useLoaderData,
+  useNavigation,
+  useActionData,
+  Outlet,
+} from "@remix-run/react";
+
+export const meta: MetaFunction = () => {
+  return [
+    { title: "Notes" },
+    { name: "description", content: "Welcome to Remix!" },
+  ];
+};
 
 export async function action({ request }: ActionFunctionArgs) {
-  const body = await request.formData();
-  const title = await body.get("title");
-  const note = await body.get("note");
-  if (title && note) {
-    await writeNotes({ title, content: note });
+  const formData = await request.formData();
+  const title = await formData.get("title");
+  const body = await formData.get("note");
+  const id = Math.random().toString(36).substring(7);
+  if (title.length > 5 && body.length > 5) {
+    await writeNotes({ title, content: body, id });
+    return null;
   }
-  async function readNotesHere() {
-    const notes = await readNotes();
-    console.log(notes);
-  }
-  readNotesHere();
-  return {
-    redirect: "/notes",
-  };
+  return json({ error: "Please write a valid note" }, { status: 400 });
 }
 
 export const loader = async () => {
@@ -26,30 +35,27 @@ export const loader = async () => {
     return notes;
   }
   const notes = await readNotesHere();
-  console.log(notes, "hi");
+
   return { notes };
 };
 
 export default function Notes() {
+  const actionData = useActionData<typeof action>();
   const data = useLoaderData<typeof loader>();
+  const navigation = useNavigation();
+
   const parsedData = JSON.parse(data.notes);
 
   return (
     <main className="w-screen h-screen flex justify-center p-5 bg-slate-500 flex-col">
+      <Outlet />
       <NewNote />
-      <div className="flex flex-wrap">
-        {parsedData.notes.map((note) => {
-          return (
-            <div
-              key={note.id}
-              className="bg-slate-300 p-3 m-3 rounded-md w-[30%]"
-            >
-              <h3>{note.title}</h3>
-              <p>{note.content}</p>
-            </div>
-          );
-        })}
-      </div>
+      {actionData?.error && <p>{actionData.error}</p>}
+      {navigation.state === "loading" ? (
+        <p>Loading...</p>
+      ) : (
+        <NotesList notes={parsedData} />
+      )}
     </main>
   );
 }

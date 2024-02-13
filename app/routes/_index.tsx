@@ -2,13 +2,6 @@ import type { MetaFunction } from "@remix-run/node";
 import { Link } from "@remix-run/react";
 import favicon from "../../public/favicon.ico";
 
-export const meta: MetaFunction = () => {
-  return [
-    { title: "New Remix App" },
-    { name: "description", content: "Welcome to Remix!" },
-  ];
-};
-
 export default function Index() {
   return (
     <div className="h-screen w-screen flex justify-center items-center flex-col gap-4">
